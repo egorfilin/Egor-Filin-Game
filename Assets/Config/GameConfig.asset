@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 036a53a88acfe924d89683f1d1ed8350, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier: 
+  cardPrefabs:
+  - {fileID: 1853532590464165145, guid: cd7fa770fbe3d894b8c052d642882822, type: 3}
+  - {fileID: 3947837353654097781, guid: 0ca5a8a91f4c2174c821be79fbd6e261, type: 3}
+  - {fileID: 3947837353654097781, guid: 8a0d5b41bf035ce46a7ab6ec26b908ea, type: 3}
+  - {fileID: 3947837353654097781, guid: 92edac3b0395a0343b7c326c84b62bf4, type: 3}
+  - {fileID: 3947837353654097781, guid: 10f23a668da40bd489e740f0cfddfb21, type: 3}
+  - {fileID: 3947837353654097781, guid: ec1d629e895db5042a8ee45c213f0ab6, type: 3}
+  - {fileID: 3947837353654097781, guid: 7c0e051ec43e8e54d89fa4874409df5e, type: 3}
+  - {fileID: 3947837353654097781, guid: c75ff91e72f847843b895686ac511ea7, type: 3}
+  levels:
+  - levelName: 1
+    columns: 2
+    rows: 3
+  - levelName: 2
+    columns: 2
+    rows: 3
+  - levelName: 3
+    columns: 3
+    rows: 4
+  - levelName: 3
+    columns: 5
+    rows: 6
+  cardSpacing: 0.4
