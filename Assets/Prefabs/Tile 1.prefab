@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 2692335828176646150}
   - component: {fileID: 196450164055360716}
   - component: {fileID: 8946664096733040226}
+  - component: {fileID: 7930340832191556564}
+  - component: {fileID: 2602299188400910203}
   m_Layer: 0
   m_Name: Tile 1
   m_TagString: Untagged
@@ -98,3 +100,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3878e9a11c1a6e64e9faa14e83eeb28a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  flipper: {fileID: 7930340832191556564}
+  flipDuration: 0.4
+  matchAnimDuration: 0.3
+--- !u!114 &7930340832191556564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1853532590464165145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e463c7e5bb352984cb3d4281f98ffa6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!65 &2602299188400910203
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1853532590464165145}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 0.14999998}
+  m_Center: {x: 0, y: 0, z: 0}

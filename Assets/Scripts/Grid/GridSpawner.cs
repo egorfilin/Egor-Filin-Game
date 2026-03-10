@@ -16,7 +16,8 @@ public class GridSpawner : MonoBehaviour
     private void Start()
     {
         FitCardZoneToScreen();
-        SpawnCards(config.levels[0]);
+        var cards = SpawnCards(config.levels[0]);
+        CardMatcher.Instance.StartLevel(cards);
     }
 
     private void FitCardZoneToScreen()
