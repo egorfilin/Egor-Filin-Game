@@ -16,8 +16,20 @@ public class GridSpawner : MonoBehaviour
     private void Start()
     {
         FitCardZoneToScreen();
-        var cards = SpawnCards(config.levels[0]);
+        int levelIndex = SaveManager.Instance.CurrentLevel;
+        levelIndex = Mathf.Clamp(levelIndex, 0, config.levels.Count - 1);
+        var cards = SpawnCards(config.levels[levelIndex]);
         CardMatcher.Instance.StartLevel(cards);
+    }
+
+    public void LoadLevel(int levelIndex)
+    {
+        FitCardZoneToScreen();
+        levelIndex = Mathf.Clamp(levelIndex, 0, config.levels.Count - 1);
+        CardMatcher.Instance.Reset();
+        var cards = SpawnCards(config.levels[levelIndex]);
+        CardMatcher.Instance.StartLevel(cards);
+        SaveManager.Instance.SaveLevel(levelIndex);
     }
 
     private void FitCardZoneToScreen()

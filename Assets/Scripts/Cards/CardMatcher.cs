@@ -70,9 +70,11 @@ public class CardMatcher : MonoBehaviour
         {
             a.PlayMatchAnimation();
             b.PlayMatchAnimation();
+            ScoreManager.Instance.RegisterMatch();
         }
         else
         {
+            ScoreManager.Instance.ResetCombo();
             yield return new WaitForSeconds(mismatchDelay);
             a.FlipToBack();
             b.FlipToBack();
