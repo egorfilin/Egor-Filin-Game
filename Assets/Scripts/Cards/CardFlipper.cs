@@ -104,10 +104,10 @@ public class CardFlipper : MonoBehaviour
         CaptureScale();
         KillCurrent();
 
-        float b = baseLocalPosition.y;
+        float b = baseLocalPosition.z;
         currentSequence = DOTween.Sequence();
-        currentSequence.Append(transform.DOLocalMoveY(b + jumpHeight, 0.1f).SetEase(Ease.OutQuad));
-        currentSequence.Append(transform.DOLocalMoveY(b, 0.1f).SetEase(Ease.InQuad));
+        currentSequence.Append(transform.DOLocalMoveZ(b - jumpHeight, 0.1f).SetEase(Ease.OutQuad));
+        currentSequence.Append(transform.DOLocalMoveZ(b, 0.1f).SetEase(Ease.InQuad));
         currentSequence.OnComplete(() =>
         {
             transform.localPosition = baseLocalPosition;
@@ -120,7 +120,7 @@ public class CardFlipper : MonoBehaviour
         CaptureScale();
         IsFaceUp = false;
 
-        float b = baseLocalPosition.y;
+        float b = baseLocalPosition.z;
         float spawnJump = 3f;
         float dur = 0.3f;
         float fromX = -180f;
@@ -129,7 +129,7 @@ public class CardFlipper : MonoBehaviour
         KillCurrent();
 
         currentSequence = DOTween.Sequence();
-        currentSequence.Append(transform.DOLocalMoveY(b + spawnJump, dur * 0.4f).SetEase(Ease.OutQuad));
+        currentSequence.Append(transform.DOLocalMoveZ(b - spawnJump, dur * 0.4f).SetEase(Ease.OutQuad));
         currentSequence.Join(
             DOTween.To(
                 () => fromX,
@@ -138,9 +138,9 @@ public class CardFlipper : MonoBehaviour
                 dur
             ).SetEase(Ease.InOutQuad)
         );
-        currentSequence.Append(transform.DOLocalMoveY(b, dur * 0.3f).SetEase(Ease.InQuad));
-        currentSequence.Append(transform.DOLocalMoveY(b + spawnJump * 0.2f, dur * 0.15f).SetEase(Ease.OutQuad));
-        currentSequence.Append(transform.DOLocalMoveY(b, dur * 0.15f).SetEase(Ease.InQuad));
+        currentSequence.Append(transform.DOLocalMoveZ(b, dur * 0.3f).SetEase(Ease.InQuad));
+        currentSequence.Append(transform.DOLocalMoveZ(b - spawnJump * 0.2f, dur * 0.15f).SetEase(Ease.OutQuad));
+        currentSequence.Append(transform.DOLocalMoveZ(b, dur * 0.15f).SetEase(Ease.InQuad));
         currentSequence.OnComplete(() =>
         {
             transform.localPosition = baseLocalPosition;
@@ -167,7 +167,7 @@ public class CardFlipper : MonoBehaviour
     {
         KillCurrent();
 
-        float b = baseLocalPosition.y;
+        float b = baseLocalPosition.z;
 
         if (!withBounce)
         {
@@ -198,7 +198,7 @@ public class CardFlipper : MonoBehaviour
 
         currentSequence = DOTween.Sequence();
 
-        currentSequence.Append(transform.DOLocalMoveY(b + jumpHeight, upTime).SetEase(Ease.OutQuad));
+        currentSequence.Append(transform.DOLocalMoveZ(b - jumpHeight, upTime).SetEase(Ease.OutQuad));
         currentSequence.Join(
             DOTween.To(
                 () => fromX,
@@ -207,11 +207,11 @@ public class CardFlipper : MonoBehaviour
                 upTime + downTime
             ).SetEase(Ease.InOutQuad)
         );
-        currentSequence.Append(transform.DOLocalMoveY(b, downTime).SetEase(Ease.InQuad));
-        currentSequence.Append(transform.DOLocalMoveY(b + jumpHeight * 0.28f, b1Up).SetEase(Ease.OutQuad));
-        currentSequence.Append(transform.DOLocalMoveY(b, b1Down).SetEase(Ease.InQuad));
-        currentSequence.Append(transform.DOLocalMoveY(b + jumpHeight * 0.08f, b2Up).SetEase(Ease.OutQuad));
-        currentSequence.Append(transform.DOLocalMoveY(b, b2Down).SetEase(Ease.InQuad));
+        currentSequence.Append(transform.DOLocalMoveZ(b, downTime).SetEase(Ease.InQuad));
+        currentSequence.Append(transform.DOLocalMoveZ(b - jumpHeight * 0.28f, b1Up).SetEase(Ease.OutQuad));
+        currentSequence.Append(transform.DOLocalMoveZ(b, b1Down).SetEase(Ease.InQuad));
+        currentSequence.Append(transform.DOLocalMoveZ(b - jumpHeight * 0.08f, b2Up).SetEase(Ease.OutQuad));
+        currentSequence.Append(transform.DOLocalMoveZ(b, b2Down).SetEase(Ease.InQuad));
 
         currentSequence.OnComplete(() =>
         {
