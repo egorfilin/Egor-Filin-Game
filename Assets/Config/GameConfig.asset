@@ -34,4 +34,4 @@ MonoBehaviour:
   - levelName: 3
     columns: 5
     rows: 6
-  cardSpacing: 0.4
+  cardSpacing: 0.6

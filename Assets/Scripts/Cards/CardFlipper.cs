@@ -1,82 +1,237 @@
 using UnityEngine;
-using System.Collections;
+using DG.Tweening;
 
 public class CardFlipper : MonoBehaviour
 {
     public bool IsFaceUp { get; private set; } = false;
 
-    private Coroutine flipCoroutine;
+    [SerializeField] private float flipDuration = 0.5f;
 
-    public void FlipToFace(float duration)
+    public float FlipDuration => flipDuration;
+    [SerializeField] private float jumpHeight = 0.5f;
+    private Sequence currentSequence;
+    private Vector3 originalScale;
+    private Vector3 baseLocalPosition;
+    private bool scaleInitialized = false;
+
+    public void ForceInitScale()
     {
-        if (flipCoroutine != null) StopCoroutine(flipCoroutine);
-        flipCoroutine = StartCoroutine(FlipRoutine(0f, 180f, duration, () => IsFaceUp = true));
+        originalScale = transform.localScale;
+        baseLocalPosition = transform.localPosition;
+        scaleInitialized = true;
     }
 
-    public void FlipToBack(float duration)
+    private void CaptureScale()
     {
-        if (flipCoroutine != null) StopCoroutine(flipCoroutine);
-        flipCoroutine = StartCoroutine(FlipRoutine(180f, 0f, duration, () => IsFaceUp = false));
+        if (!scaleInitialized)
+        {
+            originalScale = transform.localScale;
+            baseLocalPosition = transform.localPosition;
+            scaleInitialized = true;
+        }
+    }
+
+    public void FlipToFace(System.Action onComplete = null)
+    {
+        CaptureScale();
+        IsFaceUp = true;
+        PlayFlip(0f, -180f, true, onComplete);
+    }
+
+    public void FlipToBack(System.Action onComplete = null, bool withBounce = true)
+    {
+        CaptureScale();
+        IsFaceUp = false;
+        PlayFlip(-180f, -360f, withBounce, onComplete);
+    }
+
+    public void FlipFull(System.Action onComplete = null)
+    {
+        CaptureScale();
+        float currentX = transform.localEulerAngles.x;
+        if (currentX > 180f) currentX -= 360f;
+        PlayFlip(currentX, currentX - 360f, true, onComplete);
     }
 
     public void SetFaceImmediate()
     {
+        CaptureScale();
+        KillCurrent();
         IsFaceUp = true;
-        transform.localEulerAngles = new Vector3(0f, 180f, 0f);
+        transform.localEulerAngles = new Vector3(-180f, 0f, 0f);
+        transform.localScale = originalScale;
+        transform.localPosition = baseLocalPosition;
     }
 
     public void SetBackImmediate()
     {
+        CaptureScale();
+        KillCurrent();
         IsFaceUp = false;
-        transform.localEulerAngles = new Vector3(0f, 0f, 0f);
+        transform.localEulerAngles = Vector3.zero;
+        transform.localScale = originalScale;
+        transform.localPosition = baseLocalPosition;
     }
 
-    public void PlayMatchAnimation(float duration, System.Action onComplete = null)
+    public void PlayMatchAnimation(System.Action onComplete = null)
     {
-        if (flipCoroutine != null) StopCoroutine(flipCoroutine);
-        flipCoroutine = StartCoroutine(ScaleDownRoutine(duration, onComplete));
+        CaptureScale();
+        KillCurrent();
+
+        currentSequence = DOTween.Sequence();
+        currentSequence.Append(transform.DOScale(originalScale * 1.15f, 0.1f).SetEase(Ease.OutQuad));
+        currentSequence.Append(transform.DOScale(Vector3.zero, 0.22f).SetEase(Ease.InBack));
+        currentSequence.OnComplete(() => onComplete?.Invoke());
     }
 
-    private IEnumerator FlipRoutine(float fromY, float toY, float duration, System.Action onComplete)
+    public void PlaySpawnAnimation(float delay, bool faceUp = false)
     {
-        float half = duration / 2f;
-        float midY = fromY + (toY - fromY) / 2f;
+        CaptureScale();
+        KillCurrent();
+        transform.localScale = Vector3.zero;
+        transform.localPosition = baseLocalPosition;
 
-        yield return RotateYRoutine(fromY, midY, half);
-        yield return RotateYRoutine(midY, toY, half);
+        IsFaceUp = faceUp;
+        transform.localEulerAngles = faceUp ? new Vector3(-180f, 0f, 0f) : Vector3.zero;
 
-        transform.localEulerAngles = new Vector3(0f, toY, 0f);
-        onComplete?.Invoke();
-        flipCoroutine = null;
+        currentSequence = DOTween.Sequence();
+        currentSequence.AppendInterval(delay);
+        currentSequence.Append(transform.DOScale(originalScale, 0.3f).SetEase(Ease.OutBack));
     }
 
-    private IEnumerator RotateYRoutine(float from, float to, float duration)
+    public void PlayBounce()
     {
-        float elapsed = 0f;
-        while (elapsed < duration)
+        CaptureScale();
+        KillCurrent();
+
+        float b = baseLocalPosition.y;
+        currentSequence = DOTween.Sequence();
+        currentSequence.Append(transform.DOLocalMoveY(b + jumpHeight, 0.1f).SetEase(Ease.OutQuad));
+        currentSequence.Append(transform.DOLocalMoveY(b, 0.1f).SetEase(Ease.InQuad));
+        currentSequence.OnComplete(() =>
         {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / duration);
-            t = t < 0.5f ? 2f * t * t : 1f - Mathf.Pow(-2f * t + 2f, 2f) / 2f;
-            float angle = Mathf.Lerp(from, to, t);
-            transform.localEulerAngles = new Vector3(0f, angle, 0f);
-            yield return null;
-        }
+            transform.localPosition = baseLocalPosition;
+            currentSequence = null;
+        });
     }
 
-    private IEnumerator ScaleDownRoutine(float duration, System.Action onComplete)
+    public void FlipToBackWithJump(System.Action onComplete = null)
     {
-        float elapsed = 0f;
-        Vector3 startScale = transform.localScale;
-        while (elapsed < duration)
+        CaptureScale();
+        IsFaceUp = false;
+
+        float b = baseLocalPosition.y;
+        float spawnJump = 3f;
+        float dur = 0.3f;
+        float fromX = -180f;
+        float toX = -360f;
+
+        KillCurrent();
+
+        currentSequence = DOTween.Sequence();
+        currentSequence.Append(transform.DOLocalMoveY(b + spawnJump, dur * 0.4f).SetEase(Ease.OutQuad));
+        currentSequence.Join(
+            DOTween.To(
+                () => fromX,
+                x => transform.localEulerAngles = new Vector3(x, 0f, 0f),
+                toX,
+                dur
+            ).SetEase(Ease.InOutQuad)
+        );
+        currentSequence.Append(transform.DOLocalMoveY(b, dur * 0.3f).SetEase(Ease.InQuad));
+        currentSequence.Append(transform.DOLocalMoveY(b + spawnJump * 0.2f, dur * 0.15f).SetEase(Ease.OutQuad));
+        currentSequence.Append(transform.DOLocalMoveY(b, dur * 0.15f).SetEase(Ease.InQuad));
+        currentSequence.OnComplete(() =>
         {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / duration);
-            t = t * t;
-            transform.localScale = Vector3.Lerp(startScale, Vector3.zero, t);
-            yield return null;
+            transform.localPosition = baseLocalPosition;
+            transform.localScale = originalScale;
+            onComplete?.Invoke();
+        });
+    }
+
+    public void KillFlip()
+    {
+        KillCurrent();
+    }
+
+    public void SnapToFace()
+    {
+        KillCurrent();
+        IsFaceUp = true;
+        transform.localEulerAngles = new Vector3(-180f, 0f, 0f);
+        transform.localScale = originalScale;
+        transform.localPosition = baseLocalPosition;
+    }
+
+    private void PlayFlip(float fromX, float toX, bool withBounce, System.Action onComplete)
+    {
+        KillCurrent();
+
+        float b = baseLocalPosition.y;
+
+        if (!withBounce)
+        {
+            currentSequence = DOTween.Sequence();
+            currentSequence.Append(
+                DOTween.To(
+                    () => fromX,
+                    x => transform.localEulerAngles = new Vector3(x, 0f, 0f),
+                    toX,
+                    flipDuration * 0.7f
+                ).SetEase(Ease.InOutQuad)
+            );
+            currentSequence.OnComplete(() =>
+            {
+                transform.localPosition = baseLocalPosition;
+                transform.localScale = originalScale;
+                onComplete?.Invoke();
+            });
+            return;
         }
-        onComplete?.Invoke();
-        flipCoroutine = null;
+
+        float upTime   = flipDuration * 0.4f;
+        float downTime = flipDuration * 0.3f;
+        float b1Up     = flipDuration * 0.12f;
+        float b1Down   = flipDuration * 0.10f;
+        float b2Up     = flipDuration * 0.05f;
+        float b2Down   = flipDuration * 0.03f;
+
+        currentSequence = DOTween.Sequence();
+
+        currentSequence.Append(transform.DOLocalMoveY(b + jumpHeight, upTime).SetEase(Ease.OutQuad));
+        currentSequence.Join(
+            DOTween.To(
+                () => fromX,
+                x => transform.localEulerAngles = new Vector3(x, 0f, 0f),
+                toX,
+                upTime + downTime
+            ).SetEase(Ease.InOutQuad)
+        );
+        currentSequence.Append(transform.DOLocalMoveY(b, downTime).SetEase(Ease.InQuad));
+        currentSequence.Append(transform.DOLocalMoveY(b + jumpHeight * 0.28f, b1Up).SetEase(Ease.OutQuad));
+        currentSequence.Append(transform.DOLocalMoveY(b, b1Down).SetEase(Ease.InQuad));
+        currentSequence.Append(transform.DOLocalMoveY(b + jumpHeight * 0.08f, b2Up).SetEase(Ease.OutQuad));
+        currentSequence.Append(transform.DOLocalMoveY(b, b2Down).SetEase(Ease.InQuad));
+
+        currentSequence.OnComplete(() =>
+        {
+            transform.localPosition = baseLocalPosition;
+            transform.localScale = originalScale;
+            onComplete?.Invoke();
+        });
+    }
+
+    private void KillCurrent()
+    {
+        if (currentSequence != null)
+        {
+            currentSequence.Kill();
+            currentSequence = null;
+        }
+        if (scaleInitialized)
+        {
+            transform.localPosition = baseLocalPosition;
+            transform.localScale = originalScale;
+        }
     }
 }

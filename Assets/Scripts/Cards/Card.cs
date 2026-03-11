@@ -6,8 +6,6 @@ public class Card : MonoBehaviour
     public bool IsMatched { get; private set; } = false;
 
     [SerializeField] private CardFlipper flipper;
-    [SerializeField] private float flipDuration = 0.4f;
-    [SerializeField] private float matchAnimDuration = 0.3f;
 
     public void Init(int pairId)
     {
@@ -16,21 +14,42 @@ public class Card : MonoBehaviour
 
         PairId = pairId;
         IsMatched = false;
+        flipper.ForceInitScale();
         flipper.SetBackImmediate();
     }
 
     public bool IsFaceUp => flipper.IsFaceUp;
 
-    public void FlipToFace()
+    public CardFlipper GetFlipper() => flipper;
+
+    public void Bounce()
     {
-        if (IsMatched || IsFaceUp) return;
-        flipper.FlipToFace(flipDuration);
+        if (IsMatched) return;
+        flipper.PlayBounce();
     }
 
-    public void FlipToBack()
+    public void FlipToFace(System.Action onComplete = null)
     {
-        if (IsMatched || !IsFaceUp) return;
-        flipper.FlipToBack(flipDuration);
+        if (IsMatched) return;
+        flipper.FlipToFace(onComplete);
+    }
+
+    public void FlipToBack(System.Action onComplete = null, bool withBounce = true)
+    {
+        if (IsMatched) return;
+        flipper.FlipToBack(onComplete, withBounce);
+    }
+
+    public void FlipToBackWithJump(System.Action onComplete = null)
+    {
+        if (IsMatched) return;
+        flipper.FlipToBackWithJump(onComplete);
+    }
+
+    public void FlipFull(System.Action onComplete = null)
+    {
+        if (IsMatched) return;
+        flipper.FlipFull(onComplete);
     }
 
     public void ShowFaceImmediate()
@@ -38,10 +57,21 @@ public class Card : MonoBehaviour
         flipper.SetFaceImmediate();
     }
 
+    public void PlaySpawnAnimation(float delay)
+    {
+        flipper.PlaySpawnAnimation(delay, faceUp: true);
+    }
+
+    public void SetSpawnDelay(int row, int col)
+    {
+        float delay = row * 0.15f;
+        flipper.PlaySpawnAnimation(delay, faceUp: true);
+    }
+
     public void PlayMatchAnimation(System.Action onComplete = null)
     {
         IsMatched = true;
-        flipper.PlayMatchAnimation(matchAnimDuration, () =>
+        flipper.PlayMatchAnimation(() =>
         {
             onComplete?.Invoke();
             Destroy(gameObject);
@@ -50,7 +80,7 @@ public class Card : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (IsMatched || IsFaceUp) return;
+        if (IsMatched) return;
         CardMatcher.Instance.OnCardTapped(this);
     }
 }

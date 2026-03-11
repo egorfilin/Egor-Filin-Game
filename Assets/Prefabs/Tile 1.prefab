@@ -101,8 +101,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   flipper: {fileID: 7930340832191556564}
-  flipDuration: 0.4
-  matchAnimDuration: 0.3
 --- !u!114 &7930340832191556564
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -115,6 +113,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e463c7e5bb352984cb3d4281f98ffa6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  flipDuration: 0.3
+  jumpHeight: 1.5
 --- !u!65 &2602299188400910203
 BoxCollider:
   m_ObjectHideFlags: 0

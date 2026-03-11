@@ -8,6 +8,7 @@ public class GridSpawner : MonoBehaviour
     [SerializeField] private Camera gameCamera;
     [SerializeField] private float screenPaddingX = 0.9f;
     [SerializeField] private float screenPaddingY = 0.9f;
+    [SerializeField] private float maxCardSizeScreenFraction = 0.25f;
 
     private List<Card> spawnedCards = new List<Card>();
     private List<Vector3> debugPositions = new List<Vector3>();
@@ -18,8 +19,9 @@ public class GridSpawner : MonoBehaviour
         FitCardZoneToScreen();
         int levelIndex = SaveManager.Instance.CurrentLevel;
         levelIndex = Mathf.Clamp(levelIndex, 0, config.levels.Count - 1);
-        var cards = SpawnCards(config.levels[levelIndex]);
-        CardMatcher.Instance.StartLevel(cards);
+        var level = config.levels[levelIndex];
+        var cards = SpawnCards(level);
+        CardMatcher.Instance.StartLevel(cards, level.rows, level.columns);
     }
 
     public void LoadLevel(int levelIndex)
@@ -27,8 +29,9 @@ public class GridSpawner : MonoBehaviour
         FitCardZoneToScreen();
         levelIndex = Mathf.Clamp(levelIndex, 0, config.levels.Count - 1);
         CardMatcher.Instance.Reset();
-        var cards = SpawnCards(config.levels[levelIndex]);
-        CardMatcher.Instance.StartLevel(cards);
+        var level = config.levels[levelIndex];
+        var cards = SpawnCards(level);
+        CardMatcher.Instance.StartLevel(cards, level.rows, level.columns);
         SaveManager.Instance.SaveLevel(levelIndex);
     }
 
@@ -70,6 +73,10 @@ public class GridSpawner : MonoBehaviour
         if (cardSize <= 0)
             return spawnedCards;
 
+        float screenH = 2f * gameCamera.orthographicSize;
+        float maxCardSize = screenH * maxCardSizeScreenFraction;
+        cardSize = Mathf.Min(cardSize, maxCardSize);
+
         debugCardSize = cardSize;
 
         float stepX = cardSize + spacing;
@@ -103,6 +110,7 @@ public class GridSpawner : MonoBehaviour
 
                 Card card = go.GetComponent<Card>();
                 card.Init(deck[index].pairId);
+                card.SetSpawnDelay(row, col);
                 spawnedCards.Add(card);
             }
         }
