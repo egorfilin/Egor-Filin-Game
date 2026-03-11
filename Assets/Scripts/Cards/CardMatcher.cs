@@ -12,6 +12,8 @@ public class CardMatcher : MonoBehaviour
     private Card firstCard;
     private bool isLocked = false;
     private List<Card> allCards = new List<Card>();
+    private int matchedPairs = 0;
+    private int totalPairs = 0;
 
     private void Awake()
     {
@@ -23,6 +25,8 @@ public class CardMatcher : MonoBehaviour
         allCards = cards;
         firstCard = null;
         isLocked = false;
+        matchedPairs = 0;
+        totalPairs = cards.Count / 2;
         StartCoroutine(PreviewRoutine());
     }
 
@@ -68,9 +72,23 @@ public class CardMatcher : MonoBehaviour
 
         if (a.PairId == b.PairId)
         {
+            matchedPairs++;
+            bool isLastPair = matchedPairs >= totalPairs;
+
+            if (isLastPair)
+                LevelCompleteUI.Instance.Show();
+
             a.PlayMatchAnimation();
             b.PlayMatchAnimation();
             ScoreManager.Instance.RegisterMatch();
+
+            if (isLastPair)
+            {
+                int nextLevel = SaveManager.Instance.CurrentLevel + 1;
+                SaveManager.Instance.SaveLevel(nextLevel);
+                isLocked = true;
+                yield break;
+            }
         }
         else
         {
@@ -88,6 +106,8 @@ public class CardMatcher : MonoBehaviour
         StopAllCoroutines();
         firstCard = null;
         isLocked = false;
+        matchedPairs = 0;
+        totalPairs = 0;
         allCards.Clear();
     }
 }

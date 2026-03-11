@@ -31,10 +31,10 @@ public class CardFlipper : MonoBehaviour
         transform.localEulerAngles = new Vector3(0f, 0f, 0f);
     }
 
-    public void PlayMatchAnimation(float duration)
+    public void PlayMatchAnimation(float duration, System.Action onComplete = null)
     {
         if (flipCoroutine != null) StopCoroutine(flipCoroutine);
-        flipCoroutine = StartCoroutine(ScaleDownRoutine(duration));
+        flipCoroutine = StartCoroutine(ScaleDownRoutine(duration, onComplete));
     }
 
     private IEnumerator FlipRoutine(float fromY, float toY, float duration, System.Action onComplete)
@@ -64,7 +64,7 @@ public class CardFlipper : MonoBehaviour
         }
     }
 
-    private IEnumerator ScaleDownRoutine(float duration)
+    private IEnumerator ScaleDownRoutine(float duration, System.Action onComplete)
     {
         float elapsed = 0f;
         Vector3 startScale = transform.localScale;
@@ -76,7 +76,7 @@ public class CardFlipper : MonoBehaviour
             transform.localScale = Vector3.Lerp(startScale, Vector3.zero, t);
             yield return null;
         }
-        gameObject.SetActive(false);
+        onComplete?.Invoke();
         flipCoroutine = null;
     }
 }

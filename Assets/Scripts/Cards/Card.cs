@@ -38,10 +38,14 @@ public class Card : MonoBehaviour
         flipper.SetFaceImmediate();
     }
 
-    public void PlayMatchAnimation()
+    public void PlayMatchAnimation(System.Action onComplete = null)
     {
         IsMatched = true;
-        flipper.PlayMatchAnimation(matchAnimDuration);
+        flipper.PlayMatchAnimation(matchAnimDuration, () =>
+        {
+            onComplete?.Invoke();
+            Destroy(gameObject);
+        });
     }
 
     private void OnMouseDown()
