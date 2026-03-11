@@ -50,6 +50,8 @@ public class LevelCompleteUI : MonoBehaviour
             spawnedWinPanelParticles.transform.localScale = Vector3.one;
         }
 
+        SoundManager.Instance.PlayLevelComplete();
+
         yield return new WaitForSeconds(panelFadeDelay);
 
         panelCanvasGroup.interactable = true;

@@ -83,6 +83,7 @@ public class CardMatcher : MonoBehaviour
         {
             firstCard = card;
             card.FlipToFace();
+            SoundManager.Instance.PlayFlip();
             return;
         }
 
@@ -94,6 +95,7 @@ public class CardMatcher : MonoBehaviour
 
         secondCard = card;
         card.FlipToFace();
+        SoundManager.Instance.PlayFlip();
         StartCoroutine(CheckMatchRoutine());
     }
 
@@ -120,6 +122,7 @@ public class CardMatcher : MonoBehaviour
 
             int comboBeforeMatch = ScoreManager.Instance.ComboCount;
             ScoreManager.Instance.RegisterMatch();
+            SoundManager.Instance.PlayMatch();
             int coins = Mathf.Clamp((int)Mathf.Pow(2, comboBeforeMatch), 1, 8);
 
             Vector3 mergePoint = (a.transform.position + b.transform.position) * 0.5f;
@@ -156,6 +159,7 @@ public class CardMatcher : MonoBehaviour
             if (pendingMismatchA != null)
             {
                 ScoreManager.Instance.ResetCombo();
+                SoundManager.Instance.PlayMismatch();
                 pendingMismatchA?.FlipToBack();
                 pendingMismatchB?.FlipToBack();
                 pendingMismatchA = null;
